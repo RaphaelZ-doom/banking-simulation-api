@@ -26,18 +26,34 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 
-app.MapGet("/minhaconta/{valor}", (decimal valor) => //* (MapGet) e um metodo do objeto (app), e recebe dois parametros separados por virgula | "/minhaconta" e " () => {} " que e a expressao de lambda e serve pra passar um bloco de codigo inteiro
+app.MapPost("/minhaconta/{valor}", (decimal valor) => //* (MapGet) e um metodo do objeto (app), e recebe dois parametros separados por virgula | "/minhaconta" e " () => {} " que e a expressao de lambda e serve pra passar um bloco de codigo inteiro
 {                                                                                                                                                  //*como se fosse um parametro                                                                                     
     conta myaccount = new conta(); //* cria uma nova instancia "objeto", da classe conta e guarda na variavel my acc
     myaccount.deposit(valor); //* chama o metodo deposit, passando o parametro "valor" que veio da url
-    return myaccount; //* retorna o objeto "mtaccount"
+    return Results.Created($"/minhaconta/{valor}", myaccount); //* retorna o objeto "mtaccount"
 });
 
+app.MapPost("/minhaconta/sacar/{valor}", (decimal valor ) =>
+{
+    conta myaccount = new conta ();
+    myaccount.balance = 100;
+
+    try
+    {
+        myaccount.withdraw(valor);
+        return Results.Ok(myaccount);
+    }
+    catch (Exception erro)
+    {
+        return Results.BadRequest(erro.Message);
+    }
+});
 
 app.Run(); //* e o metodo final do objeto (app), que nao recebe parametros, dentro dele existe um laço de repetiçao infinito que impede a tela preta de fechar sozinha
 
 public class conta
 {
+    
     public bool active{get; set;} = true;//*se a conta esta ou nao ativa
     public decimal balance{get; set;} //*saldo da conta em decimal, para maior precisao
 
@@ -53,10 +69,13 @@ public class conta
 
         public void withdraw (decimal value) //*metodo para fazer o saque do dinheiro
     {
-        if ( balance >= value ) //* if para ver se o usuario tem saldo suficiente para sacar
+        
+        if ( value > balance ) //* if para ver se o usuario tem saldo suficiente para sacar
         {
-            balance -= value; //* se tiver saldo, ira ser sacado o valor do balance
+            throw new Exception("Saldo insuficiente para realizar o SAQUE!");
+          //* se  nao tiver saldo, ira ser receber um aviso de que o saque foi recusado;
         }
+         balance -= value; //* se tiver saldo, ira ser sacado o valor do balance
     }
    }
    
