@@ -33,19 +33,19 @@ app.MapPost("/minhaconta/{valor}", (decimal valor) => //* (MapGet) e um metodo d
     return Results.Created($"/minhaconta/{valor}", myaccount); //* retorna o objeto "mtaccount"
 });
 
-app.MapPost("/minhaconta/sacar/{valor}", (decimal valor ) =>
+app.MapPost("/minhaconta/sacar/{valor}", (decimal valor ) => //*cria um metodo para testar o saque
 {
-    conta myaccount = new conta ();
-    myaccount.balance = 100;
+    conta myaccount = new conta (); //*instancia a classe conta
+    myaccount.balance = 100; //*adiciona valor para o teste
 
-    try
+    try //* verifica atraves de um try/catch se o saque e seguro
     {
-        myaccount.withdraw(valor);
-        return Results.Ok(myaccount);
+        myaccount.withdraw(valor); //* se passar pelo "if"
+        return Results.Ok(myaccount); //*da que o resultado foi ok, e libera o saque
     }
-    catch (Exception erro)
+    catch (Exception erro) //* pega a excecao, caso o saque nao passe pelo "if"
     {
-        return Results.BadRequest(erro.Message);
+        return Results.BadRequest(erro.Message);//* manda a mensagem de erro 400, e passa a mensagem no "throw"
     }
 });
 
@@ -56,15 +56,24 @@ public class conta
     
     public bool active{get; set;} = true;//*se a conta esta ou nao ativa
     public decimal balance{get; set;} //*saldo da conta em decimal, para maior precisao
-
+    
+    public Queue<decimal> FilaDeDepositos = new Queue<decimal>(); //* cria uma propriedade de fila para processar depositos
+     
+       
     public enum  tipoConta {checkingaccount, savingsaccount, salaryaccount }//* define um novo tipo de dado
      public tipoConta acctype {get;set;} = tipoConta.checkingaccount; //* cria uma variavel acctype, que pode ser mudada de acordo com os dados enum
 
       public void deposit (decimal value) //* metodo para fazer o deposito do dinheiro
     {
-       
-       balance += value; //* serve para armazenar o valor a variavel balance
-    
+       FilaDeDepositos.Enqueue(value); //* adiciona o valor do deposito para a "queue"
+    }
+    public void processarfila ( ) //* cria um "metodo" para processar os depositos quem vem da "queue"
+    {
+        while (FilaDeDepositos.Count  != 0 ) //* "while" como estrutura de repetiçao que substitui o uso de "for" e "if", para permitir a execuçao do deposito enquanto for != de zero
+        {
+       decimal valordafila = FilaDeDepositos.Dequeue(); //* tira o valor da "queue" e adiciona em "valordafila"
+       balance += valordafila; //* passa o "valordafila" para o "balance", fechando a requisiçao de deposito
+        }    
     }
 
         public void withdraw (decimal value) //*metodo para fazer o saque do dinheiro
@@ -76,6 +85,7 @@ public class conta
           //* se  nao tiver saldo, ira ser receber um aviso de que o saque foi recusado;
         }
          balance -= value; //* se tiver saldo, ira ser sacado o valor do balance
-    }
-   }
+    }   
+
+}
    
