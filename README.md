@@ -34,4 +34,4 @@ Pré-requisitos: É necessário ter o [.NET SDK](https://dotnet.microsoft.com/do
 
 1. Clone este repositório:
    ```bash
-   git clone [https://github.com/RaphaelZ-doom/api-simulacao-bancaria.git](https://github.com/RaphaelZ-doom/api-simulacao-bancaria.git)
+   git clone (https://github.com/RaphaelZ-doom/api-simulacao-bancaria.git)
